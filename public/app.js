@@ -68,8 +68,11 @@ function splitTickets() {
 
 async function refreshHealth() {
   try {
-    const res = await fetch("/api/health");
+    const res = await fetch("/api/health", {
+      headers: { "bypass-tunnel-reminder": "true" },
+    });
     const data = await res.json();
+
     document.getElementById("mode-label").textContent = data.agentOnline
       ? "Salão online · pode pedir pelo 4G/5G"
       : "Salão offline · aguarde o Android conectar";
@@ -86,7 +89,10 @@ async function sendOrder() {
   try {
     const res = await fetch("/api/orders", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "bypass-tunnel-reminder": "true",
+      },
       body: JSON.stringify({
         slug,
         mesa: document.getElementById("mesa").value.trim() || "12",
@@ -95,6 +101,7 @@ async function sendOrder() {
         tickets,
       }),
     });
+
     const data = await res.json();
     if (!res.ok || !data.ok) throw new Error(data.error || "Falha ao enviar");
     setStatus("Pedido enviado! Já vai para a impressora.", "ok");
